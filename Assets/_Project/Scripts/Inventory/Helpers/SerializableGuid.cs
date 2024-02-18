@@ -14,11 +14,19 @@ namespace Systems.Inventory {
 
         public static SerializableGuid Empty => new(0, 0, 0, 0);
 
-        public SerializableGuid(uint val0, uint val1, uint val2, uint val3) {
-            Part1 = val0;
-            Part2 = val1;
-            Part3 = val2;
-            Part4 = val3;
+        public SerializableGuid(uint val1, uint val2, uint val3, uint val4) {
+            Part1 = val1;
+            Part2 = val2;
+            Part3 = val3;
+            Part4 = val4;
+        }
+
+        public SerializableGuid(Guid guid) {
+            byte[] bytes = guid.ToByteArray();
+            Part1 = BitConverter.ToUInt32(bytes, 0);
+            Part2 = BitConverter.ToUInt32(bytes, 4);
+            Part3 = BitConverter.ToUInt32(bytes, 8);
+            Part4 = BitConverter.ToUInt32(bytes, 12);
         }
 
         public static SerializableGuid NewGuid() => Guid.NewGuid().ToSerializableGuid();
@@ -40,6 +48,18 @@ namespace Systems.Inventory {
         public string ToHexString() {
             return $"{Part1:X8}{Part2:X8}{Part3:X8}{Part4:X8}";
         }
+
+        public Guid ToGuid() {
+            var bytes = new byte[16];
+            BitConverter.GetBytes(Part1).CopyTo(bytes, 0);
+            BitConverter.GetBytes(Part2).CopyTo(bytes, 4);
+            BitConverter.GetBytes(Part3).CopyTo(bytes, 8);
+            BitConverter.GetBytes(Part4).CopyTo(bytes, 12);
+            return new Guid(bytes);
+        }
+
+        public static implicit operator Guid(SerializableGuid serializableGuid) => serializableGuid.ToGuid();  
+        public static implicit operator SerializableGuid(Guid guid) => new SerializableGuid(guid);
 
         public override bool Equals(object obj) {
             return obj is SerializableGuid guid && this.Equals(guid);
