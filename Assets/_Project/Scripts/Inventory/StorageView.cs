@@ -21,9 +21,7 @@ namespace Systems.Inventory {
         
         public event Action<Slot, Slot> OnDrop;
         
-        IEnumerator Start() {
-            yield return StartCoroutine(InitializeView());
-            
+        void Start() {
             ghostIcon.RegisterCallback<PointerMoveEvent>(OnPointerMove);
             ghostIcon.RegisterCallback<PointerUpEvent>(OnPointerUp);
             
@@ -32,7 +30,7 @@ namespace Systems.Inventory {
             }
         }
 
-        public abstract IEnumerator InitializeView(int size = 20);
+        public abstract IEnumerator InitializeView(ViewModel viewModel);
 
         static void OnPointerDown(Vector2 position, Slot slot) {
             isDragging = true;

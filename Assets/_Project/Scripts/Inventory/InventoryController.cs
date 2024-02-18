@@ -4,7 +4,17 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Systems.Inventory {
-    public class InventoryController {
+    public class ViewModel {
+        public readonly int Capacity;
+        public readonly BindableProperty<string> Coins;
+
+        public ViewModel(InventoryModel model, int capacity) {
+            Capacity = capacity;
+            Coins = BindableProperty<string>.Bind(() => model.Coins.ToString());
+        }
+    }
+    
+    public class InventoryController { 
         readonly InventoryView view;
         readonly InventoryModel model;
         readonly int capacity;
@@ -16,26 +26,26 @@ namespace Systems.Inventory {
             this.view = view;
             this.model = model;
             this.capacity = capacity;
-            
+
             view.StartCoroutine(Initialize());
         }
-        
-        IEnumerator Initialize() {
-            // yield return view.InitializeView(capacity);
-            yield return null;
 
+        public void AddCoins(int amount) => model.Coins += amount;
+
+        IEnumerator Initialize() {
+            yield return view.InitializeView(new ViewModel(model, capacity));
+            
+            model.Coins = 105;
+            
             view.OnDrop += HandleDrop;
             model.OnModelChanged += HandleModelChanged;
-            
+
             RefreshView();
         }
 
         void HandleDrop(Slot originalSlot, Slot closestSlot) {
-            // Debug.Log("Original slot: " + originalSlot.Index);
-            // Debug.Log("Closest slot: " + closestSlot.Index);
-            
-            // Moving to Empty Slot
-            if (closestSlot.ItemId.Equals(SerializableGuid.Empty)) {
+            // Moving to Same Slot or Empty Slot
+            if (originalSlot.Index == closestSlot.Index || closestSlot.ItemId.Equals(SerializableGuid.Empty)) {
                 model.Swap(originalSlot.Index, closestSlot.Index);
                 return;
             }
@@ -43,13 +53,12 @@ namespace Systems.Inventory {
             // TODO world drops
             // TODO Cross Inventory drops
             // TODO Hotbar drops
-
+            
             // Moving to Non-Empty Slot
             var sourceItemId = model.Items[originalSlot.Index].details.Id;
             var targetItemId = model.Items[closestSlot.Index].details.Id;
-            
+                        
             if (sourceItemId.Equals(targetItemId) && model.Items[closestSlot.Index].details.maxStack > 1) { 
-                // TODO improve this handling max stack, consider options
                 model.Combine(originalSlot.Index, closestSlot.Index);
             } else {
                 model.Swap(originalSlot.Index, closestSlot.Index);
@@ -68,7 +77,7 @@ namespace Systems.Inventory {
                 }
             }
         }
-
+        
         #region Builder
         
         public class Builder {

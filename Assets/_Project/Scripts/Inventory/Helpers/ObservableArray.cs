@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Systems.Inventory {
-    public interface IObservableArray<T>{
+    public interface IObservableArray<T> {
+        event Action<T[]> AnyValueChanged;
+
         int Count { get; }
         T this[int index] { get; }
+        
+        void Swap(int index1, int index2);
         void Clear();
-        event Action<T[]> AnyValueChanged;
         bool TryAdd(T item);
         bool TryRemove(T item);
-        void Swap(int index1, int index2);
     }
 
     [Serializable]
@@ -28,15 +30,18 @@ namespace Systems.Inventory {
                 Invoke();
             }
         }
-        
+
         void Invoke() => AnyValueChanged.Invoke(items);
-        
+
         public void Swap(int index1, int index2) {
             (items[index1], items[index2]) = (items[index2], items[index1]);
             Invoke();
         }
 
-        public void Clear() { items = new T[items.Length]; }
+        public void Clear() {
+            items = new T[items.Length];
+            Invoke();
+        }
 
         public bool TryAdd(T item) {
             for (var i = 0; i < items.Length; i++) {
@@ -45,6 +50,7 @@ namespace Systems.Inventory {
                 Invoke();
                 return true;
             }
+
             return false;
         }
 
@@ -55,6 +61,7 @@ namespace Systems.Inventory {
                 Invoke();
                 return true;
             }
+
             return false;
         }
     }

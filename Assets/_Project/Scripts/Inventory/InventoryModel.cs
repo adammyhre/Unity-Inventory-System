@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 
 namespace Systems.Inventory {
-    public class InventoryModel {
+    public class InventoryModel { 
         public ObservableArray<Item> Items { get; set; }
+        public int Coins { get; set; }
 
         public event Action<Item[]> OnModelChanged {
             add => Items.AnyValueChanged += value;
@@ -30,5 +31,7 @@ namespace Systems.Inventory {
             Remove(Items[source]);
             return total;
         }
+        
+        // TODO Serialize and Deserialize
     }
 }

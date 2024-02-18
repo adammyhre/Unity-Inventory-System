@@ -16,6 +16,8 @@
     background-image: url('/Assets/FantasyCartoonGUI/Textures/Wooden_Background.png');
     width: 300px;
     padding: 10px;
+    align-items: flex-start;
+    justify-content: flex-start;
     max-height: 500px;
     flex-grow: 1;
 }
@@ -93,4 +95,18 @@ Label {
     width: 60px;
     height: 60px;
     background-image: none;
+}
+
+.coins {
+    flex-grow: 1;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.coinsIcon {
+    width: 40px;
+    height: 40px;
+    margin: 4px;
+    background-image: url('/Assets/FantasyCartoonGUI/Textures/coin.png');
 }
