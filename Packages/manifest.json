@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "com.malice.tools": "file:D:/Unity/Unity Packages/Tools",
     "com.unity.ai.navigation": "2.0.0",
     "com.unity.collab-proxy": "2.2.0",
     "com.unity.editorcoroutines": "1.0.0",
