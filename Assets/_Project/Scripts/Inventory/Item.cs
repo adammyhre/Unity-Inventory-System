@@ -13,6 +13,6 @@ namespace Systems.Inventory {
             this.quantity = quantity;
         }
         
-        // TODO Serialize and Deserialize
+        // TODO Persistence
     }
 }

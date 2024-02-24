@@ -30,12 +30,12 @@ namespace Systems.Inventory {
             view.StartCoroutine(Initialize());
         }
 
-        public void AddCoins(int amount) => model.Coins += amount;
+        public void AddCoins(int amount) => model.AddCoins(amount);
 
         IEnumerator Initialize() {
             yield return view.InitializeView(new ViewModel(model, capacity));
             
-            model.Coins = 105;
+            model.AddCoins(10);
             
             view.OnDrop += HandleDrop;
             model.OnModelChanged += HandleModelChanged;
@@ -55,10 +55,10 @@ namespace Systems.Inventory {
             // TODO Hotbar drops
             
             // Moving to Non-Empty Slot
-            var sourceItemId = model.Items[originalSlot.Index].details.Id;
-            var targetItemId = model.Items[closestSlot.Index].details.Id;
+            var sourceItemId = model.Get(originalSlot.Index).details.Id;
+            var targetItemId = model.Get(closestSlot.Index).details.Id;
                         
-            if (sourceItemId.Equals(targetItemId) && model.Items[closestSlot.Index].details.maxStack > 1) { 
+            if (sourceItemId.Equals(targetItemId) && model.Get(closestSlot.Index).details.maxStack > 1) { 
                 model.Combine(originalSlot.Index, closestSlot.Index);
             } else {
                 model.Swap(originalSlot.Index, closestSlot.Index);
@@ -70,7 +70,7 @@ namespace Systems.Inventory {
         void RefreshView() {
             for (int i = 0; i < capacity; i++) {
                 var item = model.Get(i);
-                if (item == null) {
+                if (item == null || item.Id.Equals(SerializableGuid.Empty)) {
                     view.Slots[i].Set(SerializableGuid.Empty, null);
                 } else {
                     view.Slots[i].Set(item.Id, item.details.Icon, item.quantity);

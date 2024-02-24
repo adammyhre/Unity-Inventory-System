@@ -18,7 +18,7 @@ public interface IObservableArray<T> {
 
 [Serializable]
 public class ObservableArray<T> : IObservableArray<T> {
-    private T[] items;
+    T[] items;
 
     public event Action<T[]> AnyValueChanged = delegate { };
     public int Count => items.Count(i => i != null);

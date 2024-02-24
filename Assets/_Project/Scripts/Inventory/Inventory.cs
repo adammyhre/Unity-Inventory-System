@@ -15,9 +15,5 @@ namespace Systems.Inventory {
                 .WithCapacity(capacity)
                 .Build();
         }
-
-        void Update() {
-            controller.AddCoins(1);
-        }
     }
 }

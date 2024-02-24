@@ -3,8 +3,8 @@ using System.Collections.Generic;
 
 namespace Systems.Inventory {
     public class InventoryModel { 
-        public ObservableArray<Item> Items { get; set; }
-        public int Coins { get; set; }
+        ObservableArray<Item> Items { get; set; }
+        public int Coins { get; private set; }
 
         public event Action<Item[]> OnModelChanged {
             add => Items.AnyValueChanged += value;
@@ -17,6 +17,8 @@ namespace Systems.Inventory {
                 Items.TryAdd(itemDetail.Create(1));
             }
         }
+        
+        public void AddCoins(int amount) => Coins += amount;
         
         public Item Get(int index) => Items[index];
         public void Clear() => Items.Clear();
@@ -32,6 +34,6 @@ namespace Systems.Inventory {
             return total;
         }
         
-        // TODO Serialize and Deserialize
+        // TODO Persistence
     }
 }
