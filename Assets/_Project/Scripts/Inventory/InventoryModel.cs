@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Systems.Inventory {
     public class InventoryModel { 
@@ -33,6 +34,12 @@ namespace Systems.Inventory {
 
             if (isNew) {
                 inventoryData.Items = new Item[capacity];
+            }
+            else {
+                for (var i = 0; i < capacity; i++) {
+                    if (Items[i] == null) continue;
+                    inventoryData.Items[i].details = ItemDatabase.GetDetailsById(Items[i].detailsId);
+                }
             }
 
             if (isNew && Items.Count != 0) {
