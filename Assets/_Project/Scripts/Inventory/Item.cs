@@ -12,7 +12,5 @@ namespace Systems.Inventory {
             this.details = details;
             this.quantity = quantity;
         }
-        
-        // TODO Persistence
     }
 }

@@ -1,8 +1,10 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using Sirenix.OdinInspector;
     
 namespace Systems.Inventory {
     [CreateAssetMenu(fileName = "New Item", menuName = "Inventory/Item")]
+    [Serializable]
     public class ItemDetails : ScriptableObject {
 
         [HorizontalGroup("ItemSplit", 0.75f), VerticalGroup("ItemSplit/Left")]

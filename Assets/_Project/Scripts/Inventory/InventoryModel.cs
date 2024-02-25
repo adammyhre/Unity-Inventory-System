@@ -3,8 +3,14 @@ using System.Collections.Generic;
 
 namespace Systems.Inventory {
     public class InventoryModel { 
-        ObservableArray<Item> Items { get; set; }
-        public int Coins { get; private set; }
+        ObservableArray<Item> Items { get; }
+        InventoryData inventoryData = new InventoryData();
+        readonly int capacity;
+
+        public int Coins {
+            get => inventoryData.Coins;
+            set => inventoryData.Coins = value;
+        }
 
         public event Action<Item[]> OnModelChanged {
             add => Items.AnyValueChanged += value;
@@ -12,10 +18,31 @@ namespace Systems.Inventory {
         }
         
         public InventoryModel(IEnumerable<ItemDetails> itemDetails, int capacity) {
+            this.capacity = capacity;
             Items = new ObservableArray<Item>(capacity);
             foreach (var itemDetail in itemDetails) {
                 Items.TryAdd(itemDetail.Create(1));
             }
+        }
+
+        public void Bind(InventoryData data) {
+            inventoryData = data;
+            inventoryData.Capacity = capacity;
+            
+            bool isNew = inventoryData.Items == null || inventoryData.Items.Length == 0;
+
+            if (isNew) {
+                inventoryData.Items = new Item[capacity];
+            }
+
+            if (isNew && Items.Count != 0) {
+                for (var i = 0; i < capacity; i++) {
+                    if (Items[i] == null) continue;
+                    inventoryData.Items[i] = Items[i];
+                }
+            }
+            
+            Items.items = inventoryData.Items;
         }
         
         public void AddCoins(int amount) => Coins += amount;
@@ -33,7 +60,5 @@ namespace Systems.Inventory {
             Remove(Items[source]);
             return total;
         }
-        
-        // TODO Persistence
     }
 }

@@ -29,6 +29,8 @@ namespace Systems.Inventory {
 
             view.StartCoroutine(Initialize());
         }
+        
+        public void Bind(InventoryData data) => model.Bind(data);
 
         public void AddCoins(int amount) => model.AddCoins(amount);
 
