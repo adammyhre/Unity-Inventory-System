@@ -10,6 +10,11 @@
 /[Bb]uilds/
 /[Ll]ogs/
 /[Uu]ser[Ss]ettings/
+/CCDBuildData/
+
+# Ignore everything under Assets except the _Project folder
+Assets/*
+!Assets/_Project/
 
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data
@@ -78,3 +83,4 @@ Assets/NetCodeGenerated*
 .idea/
 .DS_Store
 RiderScriptEditorPersistedState.asset
+Packages/packages-lock.json

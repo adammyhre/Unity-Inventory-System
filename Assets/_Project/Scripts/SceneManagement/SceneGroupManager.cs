@@ -2,7 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Eflatun.SceneReference;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.SceneManagement;
 
 namespace Systems.SceneManagement {
@@ -10,6 +14,8 @@ namespace Systems.SceneManagement {
         public event Action<string> OnSceneLoaded = delegate { };
         public event Action<string> OnSceneUnloaded = delegate { };
         public event Action OnSceneGroupLoaded = delegate { };
+        
+        readonly AsyncOperationHandleGroup handleGroup = new AsyncOperationHandleGroup(10);
         
         SceneGroup ActiveSceneGroup;
         
@@ -32,17 +38,24 @@ namespace Systems.SceneManagement {
             for (var i = 0; i < totalScenesToLoad; i++) {
                 var sceneData = group.Scenes[i];
                 if (reloadDupScenes == false && loadedScenes.Contains(sceneData.Name)) continue;
-
-                var operation = SceneManager.LoadSceneAsync(sceneData.Reference.Path, LoadSceneMode.Additive);
-
-                operationGroup.Operations.Add(operation);
-
+                
+                if (sceneData.Reference.State == SceneReferenceState.Regular)
+                {
+                    var operation = SceneManager.LoadSceneAsync(sceneData.Reference.Path, LoadSceneMode.Additive);
+                    operationGroup.Operations.Add(operation);
+                }
+                else if (sceneData.Reference.State == SceneReferenceState.Addressable)
+                {
+                    var sceneHandle = Addressables.LoadSceneAsync(sceneData.Reference.Path, LoadSceneMode.Additive);
+                    handleGroup.Handles.Add(sceneHandle);
+                }
+                
                 OnSceneLoaded.Invoke(sceneData.Name);
             }
             
             // Wait until all AsyncOperations in the group are done
-            while (!operationGroup.IsDone) {
-                progress?.Report(operationGroup.Progress);
+            while (!operationGroup.IsDone || !handleGroup.IsDone) {
+                progress?.Report((operationGroup.Progress + handleGroup.Progress) / 2);
                 await Task.Delay(100);
             }
 
@@ -67,6 +80,8 @@ namespace Systems.SceneManagement {
                 
                 var sceneName = sceneAt.name;
                 if (sceneName.Equals(activeScene) || sceneName == "Bootstrapper") continue;
+                if (handleGroup.Handles.Any(h => h.IsValid() && h.Result.Scene.name == sceneName)) continue;
+                
                 scenes.Add(sceneName);
             }
             
@@ -81,6 +96,13 @@ namespace Systems.SceneManagement {
 
                 OnSceneUnloaded.Invoke(scene);
             }
+            
+            foreach (var handle in handleGroup.Handles) {
+                if (handle.IsValid()) {
+                    Addressables.UnloadSceneAsync(handle);
+                }
+            }
+            handleGroup.Handles.Clear();
 
             // Wait until all AsyncOperations in the group are done
             while (!operationGroup.IsDone) {
@@ -101,6 +123,16 @@ namespace Systems.SceneManagement {
         public AsyncOperationGroup(int initialCapacity) {
             Operations = new List<AsyncOperation>(initialCapacity);
         }
+    }
+
+    public readonly struct AsyncOperationHandleGroup {
+        public readonly List<AsyncOperationHandle<SceneInstance>> Handles;
         
+        public float Progress => Handles.Count == 0 ? 0 : Handles.Average(h => h.PercentComplete);
+        public bool IsDone => Handles.Count == 0 || Handles.All(o => o.IsDone);
+
+        public AsyncOperationHandleGroup(int initialCapacity) {
+            Handles = new List<AsyncOperationHandle<SceneInstance>>(initialCapacity);
+        }
     }
 }
