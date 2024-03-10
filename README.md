@@ -18,6 +18,6 @@ Welcome to the Unity Inventory System built with UI Toolkit! This project compli
 - [Episode 2: Logic, Data and Data Binding](https://youtu.be/g2a4ZK8cEso)
 - [Episode 3: Save/Load Data Persistence](https://youtu.be/z1sMhGIgfoo)
 - [Episode 4: Awaitable Async Multi-Scene Loading](https://youtu.be/JFP-cCFID7o)
-- Episode 5: Addressable Scenes coming soon...
+- [Episode 5: Addressable Scenes](https://youtu.be/jDdq8hG0xqk)
 
 Join us on the **git-amend** [YouTube channel](https://www.youtube.com/@git-amend?sub_confirmation=1) for weekly updates and other cool stuff.
